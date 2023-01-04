@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -12,116 +12,111 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import useSound from "use-sound";
-import snare from "../Snare-Drum-Hit-Level-6b-www.fesliyanstudios.com.mp3";
-
-const useStyles = makeStyles((theme) => ({
-  paper: {
-    marginTop: theme.spacing(8),
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-  },
-  avatar: {
-    margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main,
-  },
-  form: {
-    width: "100%", // Fix IE 11 issue.
-    marginTop: theme.spacing(3),
-  },
-  submit: {
-    margin: theme.spacing(3, 0, 2),
-  },
-}));
-
+import stick1 from "../Drum-Sticks-Hit-E-www.fesliyanstudios.com.mp3";
+import stick2 from "../Drum-Sticks-Hit-G-www.fesliyanstudios.com.mp3";
 export default function Webtronome() {
-  const classes = useStyles();
-  const [bpm, setBpm] = useState(60);
-  const [accent, setAccent] = useState(1);
-  const [rhythm, setRhythm] = useState(4);
-  const [now, setNow] = useState(1);
-  const [play] = useSound(snare);
   const [isPlay, setIsPlay] = useState(false);
-  const [accentPlay] = useSound(snare, {
-    playbackRate: 1.5,
-  });
 
-  function wait(sec) {
-    let start = Date.now();
-    let now = start;
-    while (now - start < sec) {
-      now = Date.now();
+  //Beat Per Minute
+  const [bpm, setBpm] = useState(60);
+  //Accent count
+  const [accent, setAccent] = useState(0);
+  //rythme count
+  const [beatsPerMeasure, setBeatsPerMeasure] = useState(4);
+
+  const [intervalTimer, setIntervalTimer] = useState(0);
+
+  const [timeOutTimer, setTimeOutTimer] = useState([]);
+
+  const [play] = useSound(stick1);
+
+  const [accentPlay] = useSound(stick2);
+
+  const rhythm = useMemo(() => {
+    const arr = [];
+    for (let i = 0; i < beatsPerMeasure; i++) {
+      if (accent === i) {
+        arr.push(accentPlay);
+      } else {
+        arr.push(play);
+      }
     }
-  }
+    return arr;
+  }, [accent, accentPlay, beatsPerMeasure, play]);
 
-  const interval = setInterval(() => {
-    accentPlay();
-    wait(1000);
-    play();
-    wait(1000);
-    play();
-    wait(1000);
-    play();
-    wait(1000);
-  }, 4000);
+  const loop = () => {
+    setTimeOutTimer([]);
+    rhythm.forEach((sound, i) => {
+      setTimeOutTimer((current) => [
+        ...current,
+        setTimeout(() => {
+          sound();
+        }, (60 / bpm) * 1000 * (i + 1)),
+      ]);
+    });
+  };
 
+  const handleInputChange = (event) => {
+    const bpm = event.target.value;
+    if (isPlay) {
+      // stop old timer and start a new one
+      clearInterval(intervalTimer);
+
+      timeOutTimer.forEach((timeOut) => {
+        clearTimeout(timeOut);
+      });
+
+      loop();
+      setIntervalTimer(setInterval(loop, (60 / bpm) * 1000 * beatsPerMeasure));
+      // set the new bpm
+      // and reset the beat counter
+      setBpm(bpm);
+    } else {
+      // otherwise, just update the bpm
+      setBpm(bpm);
+    }
+  };
+
+  useEffect(() => {}, []);
   return (
-    <Container component="main" maxWidth="xs">
-      <CssBaseline />
-      <div className={classes.paper}>
-        <Typography component="h1" variant="h5">
-          Web Metronome
-        </Typography>
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <TextField
-              variant="outlined"
-              required
-              fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-              autoComplete="email"
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              variant="outlined"
-              required
-              fullWidth
-              name="password"
-              label="Password"
-              type="password"
-              id="password"
-              autoComplete="current-password"
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <FormControlLabel
-              control={<Checkbox value="allowExtraEmails" color="primary" />}
-              label="I want to receive inspiration, marketing promotions and updates via email."
-            />
-          </Grid>
-        </Grid>
-        <Button
-          fullWidth
-          variant="contained"
-          color="primary"
-          className={classes.submit}
-          onClick={() => {
-            setIsPlay((prev) => !prev);
-          }}
-        >
-          Sign Up
-        </Button>
-        <Grid container justifyContent="flex-end">
-          <Grid item>
-            <Link href="#" variant="body2">
-              Already have an account? Sign in
-            </Link>
-          </Grid>
-        </Grid>
+    <div className="metronome">
+      <div className="bpm-slider">
+        <input
+          type="number"
+          min="60"
+          max="240"
+          onChange={handleInputChange}
+          value={bpm}
+        />
+        <p>{bpm} BPM</p>
+        <input
+          type="range"
+          min="60"
+          max="240"
+          value={bpm}
+          onChange={handleInputChange}
+        />
       </div>
-    </Container>
+      <button
+        onClick={() => {
+          setIsPlay((prev) => {
+            if (!prev) {
+              loop();
+              setIntervalTimer(
+                setInterval(loop, (60 / bpm) * 1000 * beatsPerMeasure)
+              );
+            } else {
+              clearInterval(intervalTimer);
+              timeOutTimer.forEach((timeOut) => {
+                clearTimeout(timeOut);
+              });
+            }
+            return !prev;
+          });
+        }}
+      >
+        {isPlay ? "Stop" : "Start"}
+      </button>
+    </div>
   );
 }
