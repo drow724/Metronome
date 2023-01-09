@@ -4,7 +4,7 @@ import { IconButton } from "@material-ui/core";
 import React from "react";
 import { Stack } from "@mui/material";
 
-function UpDownComponent({ setBpm }) {
+function UpDownComponent({ setBpm, run, stop }) {
   return (
     <Stack spacing={1}>
       <IconButton
@@ -15,6 +15,7 @@ function UpDownComponent({ setBpm }) {
           setBpm((prev) => {
             return prev === 300 ? prev : prev + 1;
           });
+          stop().then(() => run());
         }}
       >
         <ArrowCircleUpTwoToneIcon />
@@ -27,6 +28,7 @@ function UpDownComponent({ setBpm }) {
           setBpm((prev) => {
             return prev === 30 ? prev : prev - 1;
           });
+          stop().then(() => run());
         }}
       >
         <ArrowCircleDownTwoToneIcon />
