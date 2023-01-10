@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/Metronome/static/css/main.77b80011.css",
+    "main.js": "/Metronome/static/js/main.a57a6004.js",
+    "static/js/329.638d0f26.chunk.js": "/Metronome/static/js/329.638d0f26.chunk.js",
+    "index.html": "/Metronome/index.html",
+    "main.77b80011.css.map": "/Metronome/static/css/main.77b80011.css.map",
+    "main.a57a6004.js.map": "/Metronome/static/js/main.a57a6004.js.map",
+    "329.638d0f26.chunk.js.map": "/Metronome/static/js/329.638d0f26.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.77b80011.css",
+    "static/js/main.a57a6004.js"
+  ]
+}
