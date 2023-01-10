@@ -1,5 +1,6 @@
 import { Box, Slider } from "@material-ui/core";
-import React, { useEffect, useMemo, useState } from "react";
+import React from "react";
+import UpDownComponent from "../components/UpDownComponent";
 
 function SliderAndDisplay({ bpm, setBpm, run, stop, isPlay, setIsPlay }) {
   return (
@@ -12,28 +13,27 @@ function SliderAndDisplay({ bpm, setBpm, run, stop, isPlay, setIsPlay }) {
             aria-label="Default"
             valueLabelDisplay="auto"
             onChange={(event, newValue) => {
-              setBpm(newValue);
-              stop().then(() => run());
+              if (isPlay) {
+                setBpm(newValue);
+                stop().then(() => run());
+              } else {
+                setBpm(newValue);
+              }
             }}
             min={30}
             max={300}
           />
         </Box>
       </div>
-      <button
-        onClick={() => {
-          setIsPlay((prev) => {
-            if (!prev) {
-              run();
-            } else {
-              stop();
-            }
-            return !prev;
-          });
-        }}
-      >
-        {isPlay ? "Stop" : "Start"}
-      </button>
+      <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+        <UpDownComponent
+          setBpm={setBpm}
+          run={run}
+          stop={stop}
+          isPlay={isPlay}
+          setIsPlay={setIsPlay}
+        />
+      </Box>
     </React.Fragment>
   );
 }

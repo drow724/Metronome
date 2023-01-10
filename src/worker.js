@@ -2,9 +2,8 @@
 // assume ./worker.ts contains
 let result;
 
-const volume = 1;
-let nextNoteTime = 0.0;
-const frequency = 440.0;
+const volume = 0.5;
+let nextNoteTime = 1.0;
 
 // create the audio context
 const audioContext = new AudioContext();
@@ -23,28 +22,26 @@ function rhythm(bpm, volumeNode, beatsPerMeasure, fn) {
   // when it is time to schedule a note to play
   // we use while becuase audioContext time is incrementing even when paused
   // so we loop until the nextNoteTime catches up
-
   while (nextNoteTime < audioContext.currentTime + 0.1) {
-    console.log("시작");
-    index++;
     // create an oscillator which generates a constant tone (a beep)
     const osc = audioContext.createOscillator();
     osc.connect(volumeNode);
-    if (index % beatsPerMeasure == 1) {
+    if (index % beatsPerMeasure === 1) {
       osc.frequency.value = 880.0;
     } else {
       osc.frequency.value = 440.0;
     }
-    console.log(index % beatsPerMeasure == 0);
+
     // start the beep at the next note time
     osc.start(nextNoteTime);
 
-    console.log(nextNoteTime);
     // stop the beep after at the note length
     osc.stop(nextNoteTime + 0.075);
-    console.log(nextNoteTime + 0.075);
+
     // calculate the time of the next note
     nextNoteTime += secondsPerBeat;
+
+    index++;
     fn(index);
   }
 }
@@ -60,5 +57,5 @@ export function start(bpm, volume, beatsPerMeasure, fn) {
 
 export function stop() {
   clearInterval(result);
-  index = 0;
+  index = 1;
 }

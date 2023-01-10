@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import SliderAndDisplay from "../components/SliderAndDisplay";
-import UpDownComponent from "../components/UpDownComponent";
+
 import { createWorkerFactory, useWorker } from "@shopify/react-web-worker";
 
 const createWorker = createWorkerFactory(() => import("../worker"));
@@ -31,7 +31,7 @@ export default function Webtronome() {
   };
 
   useEffect(() => {
-    console.log(message);
+    //console.log(message);
   }, [message]);
 
   return (
@@ -44,7 +44,6 @@ export default function Webtronome() {
         isPlay={isPlay}
         setIsPlay={setIsPlay}
       />
-      <UpDownComponent setBpm={setBpm} run={run} stop={stop} />
     </div>
   );
 }
